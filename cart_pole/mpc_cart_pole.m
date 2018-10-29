@@ -31,11 +31,14 @@ gamma = 0.5;
 
 % Number of iterations
 num_iter = 100;
+
+% Changing the nominal model from the real one
+uncert = 1.1;
  
  for i = 1:horizon-1
     
-     [u] = fnDDP_cart_pole(xo,p_target,Q_f,R,T,dt,gamma,num_iter);
-     [x_traj_next] = fnsimulate_2(xo,u(1),2,dt,0);
+     [u] = fnDDP_cart_pole(xo,p_target,Q_f,R,T,dt,gamma,num_iter,1);
+     [x_traj_next] = fnsimulate_2(xo,u(1),2,dt,0,uncert);
      x_traj(:,i+1) = x_traj_next(:,end);
      xo = x_traj_next(:,end);
      

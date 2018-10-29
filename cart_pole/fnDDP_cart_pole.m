@@ -11,7 +11,7 @@
 % fnCost_2
 % fnCostComputation
 
-function [u_k] = fnDDP_cart_pole(xo, p_target, Q_f, R, T, dt, gamma, num_iter)
+function [u_k] = fnDDP_cart_pole(xo, p_target, Q_f, R, T, dt, gamma, num_iter, uncert)
 
 global mp;
 global mc;
@@ -105,7 +105,7 @@ for k = 1:num_iter
     u_k = u_new;
 
     % Simulation of the Nonlinear System (Forward pass)
-	[x_traj] = fnsimulate_2(xo,u_new,horizon,dt,0);
+	[x_traj] = fnsimulate_2(xo,u_new,horizon,dt,0,uncert);
 	[cost(:,k)] =  fnCostComputation(x_traj,u_k,p_target,dt,Q_f,R);
     
     % Printing to the console for debugging

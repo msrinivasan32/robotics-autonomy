@@ -5,7 +5,7 @@
  % Time initialization
  horizon = 300;
  dt = 0.01;
- T = 5; % shorter DDP time horizon
+ T = 10; % shorter DDP time horizon
  
  % Trajectory initialization
  xo = zeros(2,1); % state: [theta; theta_dot]
@@ -16,22 +16,25 @@
  p_target(2,1) = 0;
  
  % Weight in Final State:
- Q_f(1,1) = 800;
- Q_f(2,2) = 200;
+ Q_f(1,1) = 400;
+ Q_f(2,2) = 100;
 
 % Weight in the Control:
- R = 0.5;
+ R = 1;
  
  % Learning Rate:
 gamma = 1;
 
 % Number of iterations
 num_iter = 100;
+
+% Changing the nominal model from the real one
+uncert = 1.1;
  
  for i = 1:horizon-1
     
-     [u] = fnDDP_pendulum(xo,p_target,Q_f,R,T,dt,gamma,num_iter);
-     [x_traj_next] = fnsimulate_1(xo,u(1),2,dt,0);
+     [u] = fnDDP_pendulum(xo,p_target,Q_f,R,T,dt,gamma,num_iter,1);
+     [x_traj_next] = fnsimulate_1(xo,u(1),2,dt,0,uncert);
      x_traj(:,i+1) = x_traj_next(:,end);
      xo = x_traj_next(:,end);
      
