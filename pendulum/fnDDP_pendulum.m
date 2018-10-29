@@ -11,11 +11,7 @@
 % fnCost_1
 % fnCostComputation
 
-clear all;
-close all;
-clc;
-
-%% SET UP GLOBAL VARIABLES
+function [u_k] = fnDDP_pendulum(xo, p_target, Q_f, R, T, dt, gamma, num_iter, uncert)
 
 global I
 global b
@@ -29,38 +25,17 @@ g = 9.81;
 l = 1;
 I = m.*l.^2;
 
-%% TIME HORIZON AND INITIAL & TARGET STATE
 
 % Time horizon parameters
-horizon = 300; % 1.5sec
-dt = 0.01; % for discretization
+horizon = T;
 
 % Initial Configuration:
-xo = zeros(2,1); % state: [theta; theta_dot]
 u_k = zeros(1,horizon-1); % control
 du_k = zeros(1,horizon-1); % control
 x_traj = zeros(2,horizon); % trajectory
 
 % Target Configuration: 
-p_target(1,1) = pi;
-p_target(2,1) = 0;
-
-
-%% PARAMETERS TO TUNE
-
-% Weight in Final State:
-Q_f(1,1) = 400;
-Q_f(2,2) = 100;
-
-% Weight in the Control:
-R = 5;
-
-% Learning Rate:
-gamma = 1;
-
-% Number of iterations
-num_iter = 100;
-
+% Given by p_target input
 
 %% DIFFERENTIAL DYNAMIC PROGRAMMING
 for k = 1:num_iter
@@ -129,48 +104,9 @@ for k = 1:num_iter
 	[cost(:,k)] =  fnCostComputation(x_traj,u_k,p_target,dt,Q_f,R);
     
     % Printing to the console for debugging
-    fprintf('iLQG Iteration %d,  Current Cost = %e, Control input = %d \n',k,cost(1,k),u_new(1,100));
+    %fprintf('iLQG Iteration %d,  Current Cost = %e, Control input = %d \n',k,cost(1,k));
 
  
 end
 
-%% PLOTTING
-
-% Setting up a time vector to span the horizon to plot against
-time(1)=0;
-for i= 2:horizon
-time(i) =time(i-1) + dt;  
 end
-
-% Plots
-figure(1)
-set(0,'DefaultAxesFontName', 'Times New Roman')
-set(0,'DefaultAxesFontSize', 12)
-set(0,'DefaultTextFontname', 'Times New Roman')
-set(0,'DefaultTextFontSize', 12)
-
-subplot(2,2,1)
-hold on
-plot(time,x_traj(1,:),'b', 'linewidth', 1.5) 
-plot(time,p_target(1,1)*ones(1,horizon),'r', 'linewidth', 1.5)
-title('Theta')
-xlabel('Time in sec')
-hold off
-grid
-
-subplot(2,2,2)
-hold on
-plot(time,x_traj(2,:),'b', 'linewidth', 1.5);
-plot(time,p_target(2,1)*ones(1,horizon),'r', 'linewidth', 1.5)
-title('Theta dot')
-xlabel('Time in sec')
-hold off
-grid
-
-subplot(2,2,3);
-hold on
-plot(cost, 'g', 'linewidth', 1.5)
-xlabel('Iterations')
-title('Cost')
-hold off
-grid

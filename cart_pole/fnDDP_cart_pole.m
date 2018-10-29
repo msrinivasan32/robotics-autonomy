@@ -6,60 +6,40 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Uses the following fuctions:
-% fnState_and_Control_Transition_Matrices_1
-% fnsimulate_1
-% fnCost_1
+% fnState_and_Control_Transition_Matrices_2
+% fnsimulate_2
+% fnCost_2
 % fnCostComputation
 
-clear all;
-close all;
-clc;
+function [u_k] = fnDDP_cart_pole(xo, p_target, Q_f, R, T, dt, gamma, num_iter, uncert)
 
-%% SET UP GLOBAL VARIABLES
+global mp;
+global mc;
+global g;
+global l;
 
-global I
-global b
-global m
-global g
-global l
+% masses in Kgr
+ mp = .01;
+ mc = 1;
 
-b = 1;
-m = 1;
-g = 9.81;
-l = 1;
-I = m.*l.^2;
+% length parameter in meters
+l = 0.25;
+
+%gravity term in meters/seconds sqaured 
+g=9.8;
 
 %% TIME HORIZON AND INITIAL & TARGET STATE
 
 % Time horizon parameters
-horizon = 300; % 1.5sec
-dt = 0.01; % for discretization
+horizon = T;
 
 % Initial Configuration:
-xo = zeros(2,1); % state: [theta; theta_dot]
 u_k = zeros(1,horizon-1); % control
 du_k = zeros(1,horizon-1); % control
-x_traj = zeros(2,horizon); % trajectory
+x_traj = zeros(4,horizon); % trajectory
 
 % Target Configuration: 
-p_target(1,1) = pi;
-p_target(2,1) = 0;
-
-
-%% PARAMETERS TO TUNE
-
-% Weight in Final State:
-Q_f(1,1) = 400;
-Q_f(2,2) = 100;
-
-% Weight in the Control:
-R = 5;
-
-% Learning Rate:
-gamma = 1;
-
-% Number of iterations
-num_iter = 100;
+% given as p_target
 
 
 %% DIFFERENTIAL DYNAMIC PROGRAMMING
@@ -74,7 +54,7 @@ for k = 1:num_iter
     for  j = 1:(horizon-1)
 
         % Quadratic approximations of the cost function
-        [l0,l_x,l_xx,l_u,l_uu,l_ux, l_xu] = fnCost_1(x_traj(:,j), u_k(:,j), j,R,dt);
+        [l0,l_x,l_xx,l_u,l_uu,l_ux, l_xu] = fnCost_2(x_traj(:,j), u_k(:,j), j,R,dt);
         % Breaking up the pieces of the appromix for ease of access later
         q0(j) = dt * l0;
         q_k(:,j) = dt * l_x;
@@ -85,11 +65,11 @@ for k = 1:num_iter
         S_k(:,:,j) = dt * l_xu;
 
         % Linearization of the dynamics
-        [dfx,dfu] = fnState_And_Control_Transition_Matrices_1(x_traj(:,j),u_k(:,j));
+        [dfx,dfu] = fnState_And_Control_Transition_Matrices_2(x_traj(:,j),u_k(:,j));
         
         % Phi and Beta from the dx(t_k+1) equation
-        phi(:,:,j) = eye(2) + dfx * dt;
-        beta(:,:,j) = dfu * dt;
+        phi(:,:,j) = eye(4,4) + dfx * dt;
+        beta(:,:,j) = dfu * dt; 
 
     end
     
@@ -114,7 +94,7 @@ for k = 1:num_iter
     end 
 
     % Determining optimal du and computing dx
-    dx = zeros(2,1);
+    dx = zeros(4,1);
     for i=1:(horizon-1)    
        du = -inv(Quu(:,:,i)) * (Qux(:,:,i)*dx+Qu(:,i));
        dx = phi(:,:,i) * dx + beta(:,:,i) * du;  
@@ -125,52 +105,14 @@ for k = 1:num_iter
     u_k = u_new;
 
     % Simulation of the Nonlinear System (Forward pass)
-	[x_traj] = fnsimulate_1(xo,u_new,horizon,dt,0,uncert);
+	[x_traj] = fnsimulate_2(xo,u_new,horizon,dt,0,uncert);
 	[cost(:,k)] =  fnCostComputation(x_traj,u_k,p_target,dt,Q_f,R);
     
     % Printing to the console for debugging
-    fprintf('iLQG Iteration %d,  Current Cost = %e, Control input = %d \n',k,cost(1,k),u_new(1,100));
+    %fprintf('iLQG Iteration %d,  Current Cost = %e \n',k,cost(1,k));
 
  
 end
 
-%% PLOTTING
-
-% Setting up a time vector to span the horizon to plot against
-time(1)=0;
-for i= 2:horizon
-time(i) =time(i-1) + dt;  
 end
 
-% Plots
-figure(1)
-set(0,'DefaultAxesFontName', 'Times New Roman')
-set(0,'DefaultAxesFontSize', 12)
-set(0,'DefaultTextFontname', 'Times New Roman')
-set(0,'DefaultTextFontSize', 12)
-
-subplot(2,2,1)
-hold on
-plot(time,x_traj(1,:),'b', 'linewidth', 1.5) 
-plot(time,p_target(1,1)*ones(1,horizon),'r', 'linewidth', 1.5)
-title('Theta')
-xlabel('Time in sec')
-hold off
-grid
-
-subplot(2,2,2)
-hold on
-plot(time,x_traj(2,:),'b', 'linewidth', 1.5);
-plot(time,p_target(2,1)*ones(1,horizon),'r', 'linewidth', 1.5)
-title('Theta dot')
-xlabel('Time in sec')
-hold off
-grid
-
-subplot(2,2,3);
-hold on
-plot(cost, 'g', 'linewidth', 1.5)
-xlabel('Iterations')
-title('Cost')
-hold off
-grid
