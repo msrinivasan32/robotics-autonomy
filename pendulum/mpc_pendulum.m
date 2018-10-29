@@ -2,6 +2,8 @@
  clc;
  close all;
  
+ % Hello nathan
+ 
  % Time initialization
  horizon = 300;
  dt = 0.01;
