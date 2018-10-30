@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{titlepage}
+    \center
+    \textsc{\LARGE AE 4803: Homework 2}\\[1.5cm]
+    \textsc{\Large Leader: Madison Stein}\\[0.5cm]
+    \textsc{\Large Group Members: Vinh Phuc Bui, Charles Andrew Person, Mahalakshmi Srinivasan, Nathan Wang}\\[2cm]
+    \textsc{\large Instructor: Evangelos Theodorou}\\[0.5cm]
+    \textsc{\large TA: Zhanzhan Zhao}\\[1cm]
+    \textsc{\large November 2nd, 2018}
+\end{titlepage}
+
+\section{Applying Model Predictive Control (MPC) and Differential Dynamic Programming (DDP) to the inverted pendulum dynamics}
+
+Given:
+\begin{equation}
+I\ddot{\theta} +b\dot{\theta} + mglsin(\theta) = u
+\end{equation}
+
+The Model Predictive Control algorithm was implemented for the inverted pendulum dynamics based on the MPC-DDP pseudo-code provided. The time horizon given to the DDP algorithm was significantly lower than that of the overall MPC algorithm. After applying DDP for a shorter time horizon, the dynamics of the system were simulated and the first element in the DDP control output was applied. The state output of the simulation was then used as the current state for the next iteration of the MPC loop. This was repeated until reasonable convergence was achieved.
+
+
+While convergence was easier to achieve with a larger time horizon input to DDP, this came at a cost since DDP took longer for longer time horizons. As a result, the optimal solutions considered were those with shorter DDP time horizons that still met convergence criteria.
+
+
+Using the following weights for the final state and the control and the following time horizon, convergence was achieved:
+
+
+Weights
+
+Time horizon
+
+
+The figure below illustrates the convergence of the states to their final value using this MPC-DDP approach.
+
+\section {Applying MPC and DDP to the cart pole dynamics}
+
+Given:
+
+
+A similar approach as above was implemented for the cart pole dynamics using the existing DDP code from the previous assignment. The weights and time horizon used are as follows:
+
+
+Weights
+
+Time horizon
+
+
+The figure below illustrates the convergence of the states to their final value using the MPC-DDP approach. It should be noted that the state variable x does not need to converge to anything as a terminal value was not provided in the problem. A value of 10 was simply set as a target state to ensure the code would function appropriately.
+
+
+\section {Robustness of MPC-DDP}
+
+To validate the robustness of the MPC-DDP algorithm, an uncertainty term corresponding to a percentage uncertainty in the model parameters was applied to the real system, while the nominal linearized values remained the same as the specifications in the problem. 
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
