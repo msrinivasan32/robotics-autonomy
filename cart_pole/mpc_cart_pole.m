@@ -19,9 +19,9 @@ close all;
  
 % Weight in Final State:
 Q_f(1,1) = 1;
-Q_f(2,2) = 150;
-Q_f(3,3) = 400;
-Q_f(4,4) = 50;
+Q_f(2,2) = 50;
+Q_f(3,3) = 500;
+Q_f(4,4) = 25;
 
 % Weight in the Control:
 R = 2 * eye(1,1);
