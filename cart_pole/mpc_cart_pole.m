@@ -10,6 +10,8 @@ close all;
  % Trajectory initialization
  xo = zeros(4,1); % state: [x; x_dot; theta; theta_dot]
  x_traj = zeros(4,horizon); % trajectory
+ xo_different=zeros(4,1);
+ x_traj_different=zeros(4,horizon);
  
  % Final configuration
  p_target(1,1) = 10; 
@@ -33,8 +35,8 @@ gamma = 0.5;
 num_iter = 100;
 
 % Changing the nominal model from the real one
-uncert = 1.1;
- 
+uncert = 1;
+otheruncert=1.1;
  for i = 1:horizon-1
     
      [u] = fnDDP_cart_pole(xo,p_target,Q_f,R,T,dt,gamma,num_iter,1);
@@ -42,6 +44,10 @@ uncert = 1.1;
      x_traj(:,i+1) = x_traj_next(:,end);
      xo = x_traj_next(:,end);
      
+      [u_different]=fnDDP_cart_pole(xo,p_target,Q_f,R,T,dt,gamma,num_iter,1);
+     [x_traj_next_different] = fnsimulate_2(xo_different,u(1),2,dt,0,otheruncert);
+      x_traj_different(:,i+1) = x_traj_next_different(:,end);
+      xo_different = x_traj_next_different(:,end);
      fprintf('iLQG Horizon %d,  Current State %d %d,   Control applied %d \n',i, xo(3), xo(4), u(1));
  end 
 
@@ -56,6 +62,7 @@ time(i) =time(i-1) + dt;
 end
 
 figure(2)
+title('Original System')
 set(0,'DefaultAxesFontName', 'Times New Roman')
 set(0,'DefaultAxesFontSize', 12)
 set(0,'DefaultTextFontname', 'Times New Roman')
@@ -97,3 +104,40 @@ xlabel('Time in sec')
 hold off
 grid
 
+figure(3)
+title('Test of Robustness')
+subplot(3,2,1)
+hold on
+plot(time,x_traj_different(1,:),'b', 'linewidth', 1.5) 
+plot(time,p_target(1,1)*ones(1,horizon),'r', 'linewidth', 1.5)
+title('X')
+xlabel('Time in sec')
+hold off
+grid
+
+subplot(3,2,2)
+hold on
+plot(time,x_traj_different(2,:),'b', 'linewidth', 1.5);
+plot(time,p_target(2,1)*ones(1,horizon),'r', 'linewidth', 1.5)
+title('X dot')
+xlabel('Time in sec')
+hold off
+grid
+
+subplot(3,2,3)
+hold on
+plot(time,x_traj_different(3,:),'b', 'linewidth', 1.5);
+plot(time,p_target(3,1)*ones(1,horizon),'r', 'linewidth', 1.5)
+title('Theta')
+xlabel('Time in sec')
+hold off
+grid
+
+subplot(3,2,4)
+hold on
+plot(time,x_traj_different(4,:), 'b', 'linewidth', 1.5)
+plot(time,p_target(4,1)*ones(1,horizon),'r', 'linewidth', 1.5)
+title('Theta dot')
+xlabel('Time in sec')
+hold off
+grid

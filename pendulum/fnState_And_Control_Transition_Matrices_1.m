@@ -1,10 +1,10 @@
 function [dfx,dfu] = fnState_And_Control_Transition_Matrices_1(x,u)
 
-    global b
-    global m
-    global g
-    global l
-    global I
+b = 1;
+m = 1;
+g = 9.81;
+l = 1;
+I = m.*l.^2;
 
     x1 = x(1,1);
     x2 = x(2,1);

@@ -1,9 +1,9 @@
 function [A,B] = fnState_And_Control_Transition_Matrices_2(x,u)
 
-    global mp;
-    global mc;
-    global g;
-    global l;
+mp = .01;
+mc = 1;
+l = 0.25;
+g=9.8;
 
     x1 = x(1,1);
     x2 = x(2,1);
