@@ -36,7 +36,7 @@ num_iter = 100;
 
 % Changing the nominal model from the real one
 uncert = 1;
-otheruncert=1.1;
+otheruncert=1.00001;
  for i = 1:horizon-1
     
      [u] = fnDDP_cart_pole(xo,p_target,Q_f,R,T,dt,gamma,num_iter,1);
