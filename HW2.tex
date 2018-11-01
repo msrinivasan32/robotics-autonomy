@@ -39,41 +39,34 @@ Time horizon
 
 The figure below illustrates the convergence of the states to their final value using this MPC-DDP approach.
 
-\section {Applying MPC and DDP to the cart pole dynamics}
+\section{Applying MPC and DDP to the cart pole dynamics}
 
 Given:
 \begin{equation}
 \ddot{x} = \frac{1}{m_c + m_p{\sin}^2\theta}(f + m_p \sin\theta(l{\dot{\theta}}^2 + g\cos\theta))
 \end{equation}
 \begin{equation}
-\ddot{\theta} = \frac{1}{l(m_c + m_p{\sin}^2{\theta})}(-f\cos\theta - m_pl{\dot{\theta}}^2\cos{\theta}\sin{\theta} - (m_c + m_p)g\sin\theta))
+\ddot{\theta} = \frac{1}{l(m_c + m_p{\sin}^2{\theta})}(-f\cos\theta - 				m_pl{\dot{\theta}}^2\cos{\theta}\sin{\theta} - (m_c + m_p)g\sin\theta))
 \end{equation}
 
 
-A similar approach as above was implemented for the cart pole dynamics using the existing DDP code from the previous assignment. The weights and time horizon used are as follows:
+A similar approach as above was implemented for the cart pole dynamics using 		the existing DDP code from the previous assignment. The weights and time 			horizon used are as follows:
 
+$$
+Q = 
+\begin{vmatrix}
+x & x \\ x & x
+\end{vmatrix}
+$$
 
-Weights
-
-Time horizon
-
+\begin{center}
+Time horizon = xxx
+\end{center}
 
 The figure below illustrates the convergence of the states to their final value using the MPC-DDP approach. It should be noted that the state variable x does not need to converge to anything as a terminal value was not provided in the problem. A value of 10 was simply set as a target state to ensure the code would function appropriately.
 
+\section{Robustness of MPC-DDP}
 
-\section {Robustness of MPC-DDP}
-
-To validate the robustness of the MPC-DDP algorithm, an uncertainty term corresponding to a percentage uncertainty in the model parameters was applied to the real system, while the nominal linearized values remained the same as the specifications in the problem. 
-
-
-
-
-
-
-
-
-
-
-ase
+To validate the robustness of the MPC-DDP algorithm, an uncertainty term corresponding to a percentage uncertainty in the model parameters was applied to the real system, while the nominal linearized values remained the same as the specifications in the problem.
 
 \end{document}
