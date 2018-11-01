@@ -20,7 +20,7 @@
 
 Given:
 \begin{equation}
-I\ddot{\theta} +b\dot{\theta} + mglsin(\theta) = u
+I\ddot{\theta} + b\dot{\theta} + mglsin(\theta) = u
 \end{equation}
 
 The Model Predictive Control algorithm was implemented for the inverted pendulum dynamics based on the MPC-DDP pseudo-code provided. The time horizon given to the DDP algorithm was significantly lower than that of the overall MPC algorithm. After applying DDP for a shorter time horizon, the dynamics of the system were simulated and the first element in the DDP control output was applied. The state output of the simulation was then used as the current state for the next iteration of the MPC loop. This was repeated until reasonable convergence was achieved.
@@ -42,6 +42,12 @@ The figure below illustrates the convergence of the states to their final value 
 \section {Applying MPC and DDP to the cart pole dynamics}
 
 Given:
+\begin{equation}
+\ddot{x} = \frac{1}{m_c + m_p{\sin}^2\theta}(f + m_p \sin\theta(l{\dot{\theta}}^2 + g\cos\theta))
+\end{equation}
+\begin{equation}
+\ddot{\theta} = \frac{1}{l(m_c + m_p{\sin}^2{\theta})}(-f\cos\theta - m_pl{\dot{\theta}}^2\cos{\theta}\sin{\theta} - (m_c + m_p)g\sin\theta))
+\end{equation}
 
 
 A similar approach as above was implemented for the cart pole dynamics using the existing DDP code from the previous assignment. The weights and time horizon used are as follows:
@@ -68,6 +74,6 @@ To validate the robustness of the MPC-DDP algorithm, an uncertainty term corresp
 
 
 
-
+ase
 
 \end{document}
