@@ -21,12 +21,29 @@
 We consider the objective function
 
 \begin{equation}
+J(\theta) = 
 \frac{1}{2} \sum\limits_{k=1}^N (\alpha(k) \frac{(z(k) - \theta^T \phi(k))^2}{m(k)^2}) + \frac{1}{2} (\theta - \theta_0)^T {P_0}^{-1} (\theta - \theta_0)
 \end{equation}
 
-with $P_0 > 0$ a definite matrix and $\alpha(k)$ a non-negative sequence of weighting coefficients.
+with $P_0 > 0$ a definite matrix and $\alpha(k)$ a non-negative sequence of weighting coefficients, with $N$ measurements and $\theta_0$ an initial guess for $\theta$. We have the parametric model
 
-We can define
+\begin{equation}
+z(k) = \theta^{\alpha t} (k-1) \phi (k)
+\end{equation}
+
+with $z$ and $\phi$ as measurements and $\theta$ as the parameters. We then have an estimate of the measurement vector as
+
+\begin{equation}
+\hat{z} (k) = \theta^T (k-1) \phi (k)
+\end{equation}
+
+so that the error prediction is
+
+\begin{equation}
+\varepsilon (k) = \frac{z(k) - \hat{z}(k)}{m(k)^2} = \frac{z(k) - \theta (k-1)^T \phi(k)}{m(k)^2}
+\end{equation}
+
+We can then define
 
 \[
 Z_k =
@@ -41,6 +58,103 @@ Z_k =
 \frac{\phi(1)}{m(1)},\frac{\phi(2)}{m(2)},\frac{\phi(3)}{m(3)},...,\frac{\phi(k)}{m(k)}
 \end{bmatrix}^T
 \]
+
+\[
+A = 
+\begin{bmatrix}
+\alpha(1),\alpha(2),\alpha(3),...,\alpha(k)
+\end{bmatrix}
+\]
+
+and the objective function can be rewritten as
+
+\begin{equation}
+J(\theta) = \frac{1}{2} A (Z_k - \Phi_k \theta)^T (Z_k - \Phi_k \theta) + \frac{1}{2} (\theta \theta_0)^T {P_0}^{-1} (\theta - \theta_0)
+\end{equation}
+
+Then, to minimize cost, we take the gradient of $J(\theta)$ with respect to $\theta$ and set equal to $0$.
+
+\begin{equation}
+\nabla_\theta J(\theta) = -A {\Phi_k}^T Z_k + A {\Phi_k}^T \Phi_k \theta + {P_0}^{-1} \theta - {P_0}^{-1} \theta_0 = 0
+\end{equation}
+
+We then solve for $\theta$ to get
+
+\begin{equation}
+\theta = (A {\Phi_k}^T \Phi_k + {P_0}^{-1})^{-1} (A {\Phi_k}^T Z_k + {P_0}^{-1} \theta_0)
+\end{equation}
+
+and we define
+
+\begin{equation}
+{P_k}^{-1} = A {\Phi_k}^T \Phi_k + {P_0}^{-1} \Rightarrow P(k)^{-1} = A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}
+\end{equation}
+
+then
+
+\begin{equation}
+P(k)^{-1} - P(k-1)^{-1} = \alpha (k) \frac{\phi(k)\phi(k)^T}{m(k)^2} \Rightarrow P(k)^{-1} = P(k-1)^{-1} + \alpha (k) \frac{\phi(k)\phi(k)^T0}{m(k)^2}
+\end{equation}
+
+We can then use matrix inversion lemma
+
+\begin{equation}
+(A+BC)^{-1} = A^{-1}-A^{-1}B(I+CA^{-1}B)^{-1}CA^{-1}
+\end{equation}
+
+and define $A=P(k-1)^{-1}$, $B=\alpha(k)\frac{\phi(k)}{m(k)}$, $C=\frac{\phi(k)^T}{m(k)}$ so we can then achieve
+
+\begin{equation}
+P(k) = P(k-1) - \frac{P(k-1)\alpha(k)\phi(k)\phi(k)^TP(k-1)}{m(k)^2+\alpha(k)\phi(k)^TP(k-1)\phi(k)}
+\end{equation}
+
+We then derive update law for $\theta(k)$ based on parameters in the previous iteration
+
+\begin{equation}
+\theta(k) = P(k) (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0 + \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}) P(k) (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0) + P(k) \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}
+\end{equation}
+
+and $\theta(k-1)$ can be written as
+
+\begin{equation}
+\theta(k-1) = (A {\Phi_{k-1}}^T \Phi_{k-1} + P_0)^{-1}(A \Phi_{k-1} Z_{k-1} + {P_0}^{-1} \theta_0)
+\end{equation}
+
+so
+
+\begin{equation}
+(A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}) = (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0)
+\end{equation}
+
+Substituting this into $(14)$, we get
+
+\[
+\theta(k) = P(k) (A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}) \theta(k-1) + P(k) \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}
+\]
+
+\begin{equation}
+= P(k)P(k-1)^{-1} \theta(k-1) + P(k) \alpha(k) \frac{/phi(k)z(k)}{m(k)^2}
+\end{equation}
+
+Then, by substituting Eqn. 10 into Eqn. 16, we get
+
+\begin{equation}
+\theta(k) = P(k)(P(k)^{-1} - \alpha(k) \frac{\phi(k)\phi(k)^T}{m(k)^2} \theta(k-1) + P(k)
+\end{equation}
+
+which simplifies to
+
+\begin{equation}
+\theta(k) = \theta(k-1) + P(k) \frac{\alpha(k)\phi(k)(z(k) - \phi(k)^T\theta(k-1))}{m(k)^2}
+\end{equation}
+
+Substituting Eqn. 3 into Eqn. 18, we get final update law for unknown parameters $\theta$
+
+\begin{equation}
+\theta(k) = \theta(k-1) + P(k) \alpha(k) \phi(k) \varepsilon(k)
+\end{equation}
+
+Thus, we have derived equations for recursive least squares algorithm to minimize the cost function in Eqn. 1 to identify values of parameters in $\theta$
 
 \section{Least Squares and Differential Dynamic Programming}
 
