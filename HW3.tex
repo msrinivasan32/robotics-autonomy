@@ -158,6 +158,16 @@ Thus, we have derived equations for recursive least squares algorithm to minimiz
 
 \section{Least Squares and Differential Dynamic Programming}
 
+We consider the cart-pole equations of motion
+
+\begin{equation}
+\ddot{x} = \frac{1}{m_c + m_p \sin^2 \theta} (f + m_p \sin \theta (l \dot{\theta}^2 + g \cos \theta))
+\end{equation}
+
+\begin{equation}
+\ddot{\theta} = \frac{1}{l(m_c + m_p \sin^2 \theta)} (-f\cos \theta - m_p l \dot{\theta}^2 \cos \theta \sin \theta - (m_c + m_p) g \sin \theta))
+\end{equation}
+
 \section{Bonus: Multidimensional Least Squares}
 
 \end{document}
