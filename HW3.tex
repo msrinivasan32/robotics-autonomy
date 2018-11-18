@@ -154,7 +154,7 @@ Substituting Eqn. 3 into Eqn. 18, we get final update law for unknown parameters
 \theta(k) = \theta(k-1) + P(k) \alpha(k) \phi(k) \varepsilon(k)
 \end{equation}
 
-Thus, we have derived equations for recursive least squares algorithm to minimize the cost function in Eqn. 1 to identify values of parameters in $\theta$
+Thus, we have derived equations for recursive least squares algorithm to minimize the cost function in Eqn. 1 to identify values of parameters in $\theta$.
 
 \section{Least Squares and Differential Dynamic Programming}
 
@@ -164,8 +164,26 @@ We consider the cart-pole equations of motion
 \ddot{x} = \frac{1}{m_c + m_p \sin^2 \theta} (f + m_p \sin \theta (l \dot{\theta}^2 + g \cos \theta))
 \end{equation}
 
+with $m_c$, $m_p$, and $l$ unkown, and only initial guesses for $\hat{m}_c$, $\hat{m}_p$, and $\hat{l}$ available. By parametrizing to form
+
 \begin{equation}
-\ddot{\theta} = \frac{1}{l(m_c + m_p \sin^2 \theta)} (-f\cos \theta - m_p l \dot{\theta}^2 \cos \theta \sin \theta - (m_c + m_p) g \sin \theta))
+\mathbf{z} = \mathbf{w}^T \phi(\mathbf{x})
+\end{equation}
+
+we result in
+
+\begin{equation}
+\underbrace{f}_{\mathbf{z}} = 
+\underbrace{
+\begin{bmatrix}
+m_p & m_c & l
+\end{bmatrix}}_{\mathbf{w}^T}
+\underbrace{
+\begin{bmatrix}
+\ddot{x} \sin^2 \theta - g \sin \theta \cos \theta \\
+\ddot{x} \\
+- \sin \theta \dot{\theta}^2
+\end{bmatrix}}_{\phi}
 \end{equation}
 
 \section{Bonus: Multidimensional Least Squares}
