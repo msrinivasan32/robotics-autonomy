@@ -10,6 +10,7 @@
 % fnsimulate_2
 % fnCost_2
 % fnCostComputation
+% fnLS
 
 function [u_k] = fnDDP_cart_pole(xo, p_target, Q_f, R, T, dt, gamma, num_iter, uncert)
 
@@ -18,6 +19,10 @@ global mc;
 global g;
 global l;
 
+global mphat;
+global mchat;
+global lhat;
+
 % masses in Kgr
  mp = .01;
  mc = 1;
@@ -25,6 +30,14 @@ global l;
 % length parameter in meters
 l = 0.25;
 
+%initial guesses
+mphat = .01;
+mchat = 1;
+lhat = 0.25;
+
+paramchange(1,1)=mphat;
+paramchange(2,1)=mchat;
+paramchange(3,1)=lhat;
 %gravity term in meters/seconds sqaured 
 g=9.8;
 
@@ -110,8 +123,12 @@ for k = 1:num_iter
     
     % Printing to the console for debugging
     %fprintf('iLQG Iteration %d,  Current Cost = %e \n',k,cost(1,k));
-
- 
+    
+    % Linear Regression to get new parameters 
+    [mphat,mchat,lhat]=fnLS();
+    paramchange(1,k+1)=mphat;
+    paramchange(2,k+1)=mchat;
+    paramchange(3,k+1)=lhat;
 end
 
 end

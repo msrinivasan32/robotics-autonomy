@@ -10,6 +10,7 @@
 % fnsimulate_2
 % fnCost_2
 % fnCostComputation
+% fnLS
 
 clear all;
 close all;
@@ -22,6 +23,10 @@ global mc;
 global g;
 global l;
 
+global mphat;
+global mchat;
+global lhat;
+
 % masses in Kgr
  mp = .01;
  mc = 1;
@@ -32,10 +37,19 @@ l = 0.25;
 %gravity term in meters/seconds sqaured 
 g=9.8;
 
+%initial guesses
+mphat = .01;
+mchat = 1;
+lhat = 0.25;
+
+paramchange(1,1)=mphat;
+paramchange(2,1)=mchat;
+paramchange(3,1)=lhat;
+
 %% TIME HORIZON AND INITIAL & TARGET STATE
 
 % Time horizon parameters
-horizon = 300; % 1.5sec
+horizon = 50; % 1.5sec
 dt = 0.01; % for discretization
 
 % Initial Configuration:
@@ -132,12 +146,17 @@ for k = 1:num_iter
     u_k = u_new;
 
     % Simulation of the Nonlinear System (Forward pass)
-	[x_traj] = fnsimulate_2(xo,u_new,horizon,dt,0);
-	[cost(:,k)] =  fnCostComputation(x_traj,u_k,p_target,dt,Q_f,R);
+	[x_traj] = fnsimulate_2(xo,u_new,horizon,dt,1);
+	[cost(:,k)] = fnCostComputation(x_traj,u_k,p_target,dt,Q_f,R);
     
     % Printing to the console for debugging
     fprintf('iLQG Iteration %d,  Current Cost = %e \n',k,cost(1,k));
 
+    % Linear Regression to get new parameters 
+    [mphat,mchat,lhat]=fnLS(x_traj,u_k,dt);
+    paramchange(1,k+1)=mphat;
+    paramchange(2,k+1)=mchat;
+    paramchange(3,k+1)=lhat;
  
 end
 
@@ -149,7 +168,6 @@ for i= 2:horizon
 time(i) =time(i-1) + dt;  
 end
 
-% TODO: Update titles for each one AND remove unnecessary ones
 % TODO: Add ylabels?
 
 figure(1)
@@ -158,7 +176,7 @@ set(0,'DefaultAxesFontSize', 12)
 set(0,'DefaultTextFontname', 'Times New Roman')
 set(0,'DefaultTextFontSize', 12)
 
-subplot(3,2,1)
+subplot(4,2,1)
 hold on
 plot(time,x_traj(1,:),'b', 'linewidth', 1.5) 
 plot(time,p_target(1,1)*ones(1,horizon),'r', 'linewidth', 1.5)
@@ -167,7 +185,7 @@ xlabel('Time in sec')
 hold off
 grid
 
-subplot(3,2,2)
+subplot(4,2,2)
 hold on
 plot(time,x_traj(2,:),'b', 'linewidth', 1.5);
 plot(time,p_target(2,1)*ones(1,horizon),'r', 'linewidth', 1.5)
@@ -176,7 +194,7 @@ xlabel('Time in sec')
 hold off
 grid
 
-subplot(3,2,3)
+subplot(4,2,3)
 hold on
 plot(time,x_traj(3,:),'b', 'linewidth', 1.5);
 plot(time,p_target(3,1)*ones(1,horizon),'r', 'linewidth', 1.5)
@@ -185,7 +203,7 @@ xlabel('Time in sec')
 hold off
 grid
 
-subplot(3,2,4)
+subplot(4,2,4)
 hold on
 plot(time,x_traj(4,:), 'b', 'linewidth', 1.5)
 plot(time,p_target(4,1)*ones(1,horizon),'r', 'linewidth', 1.5)
@@ -194,7 +212,7 @@ xlabel('Time in sec')
 hold off
 grid
 
-subplot(3,2,5);
+subplot(4,2,5);
 hold on
 plot(cost, 'g', 'linewidth', 1.5)
 xlabel('Iterations')
@@ -202,3 +220,29 @@ title('Cost')
 hold off
 grid
 
+subplot(4,2,6);
+hold on
+plot(time,mp*ones(1,horizon),'r','linewidth',1.5)
+plot(time,paramchange(1,:),'b','linewidth',1.5)
+title('Mp')
+xlabel('Time in sec')
+hold off
+grid
+
+subplot(4,2,7);
+hold on
+plot(time,mc*ones(1,horizon),'r','linewidth',1.5)
+plot(time,paramchange(2,:),'b','linewidth',1.5)
+title('Mc')
+xlabel('Time in sec')
+hold off
+grid
+
+subplot(4,2,8)
+hold on
+plot(time,l*ones(1,horizon),'r','linewidth',1.5)
+plot(time,paramchange(3,:),'b','linewidth',1.5)
+title('Length')
+xlabel('Time in sec')
+hold off 
+grid

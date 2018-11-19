@@ -1,4 +1,4 @@
-function [x] = fnsimulate_2(xo,u_new,Horizon,dt,sigma,uncert)
+function [x] = fnsimulate_2(xo,u_new,Horizon,dt,uncert)
 
 global mp;
 global mc;
@@ -22,6 +22,6 @@ for k = 1:(Horizon-1)
     G_x(3,1) = 0;
     G_x(4,1) = -cos(x(3,k)).*coeff2;
 
-    x(:,k+1) = x(:,k) + Fx * dt + G_x * u_new(:,k) * dt  + G_x * u_new(:,k) * sqrt(dt) * sigma * randn;
-
+    x(:,k+1) = x(:,k) + Fx * dt + G_x * u_new(:,k) * dt  + G_x * u_new(:,k) * sqrt(dt) * randn;
+ 
 end

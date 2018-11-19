@@ -1,9 +1,10 @@
 function [A,B] = fnState_And_Control_Transition_Matrices_2(x,u)
 
-mp = .01;
-mc = 1;
-l = 0.25;
-g=9.8;
+global mphat
+global mchat
+global lhat
+global g
+
 
     x1 = x(1,1);
     x2 = x(2,1);
@@ -15,17 +16,17 @@ g=9.8;
     A = zeros(4,4);
     B = zeros(4,1);
 
-    coeff1 = 1/(mc + mp.*sin(x3).^2);
-    coeff2 = coeff1./l;
+    coeff1 = 1/(mchat + mphat.*sin(x3).^2);
+    coeff2 = coeff1./lhat;
 
     A(1,2) = 1;
-    A(2,3)=(x4^2*mp*cos(x3)*(mc-mp*(sin(x3)^2))-2*u1*mp*sin(x3)*cos(x3)-mp*g*(sin(x3)^2)*(mp*(sin(x3)^2)+mc)+(cos(x3)^2)*(mp*(sin(x3)^2)-mc))...
-        /((mp*(sin(x3)^2)+mc)^2);
-    A(2,4)=2*mp*l*sin(x3)*x4/(mc+mp*(sin(x3)^2));
+    A(2,3)=(x4^2*mphat*cos(x3)*(mchat-mphat*(sin(x3)^2))-2*u1*mphat*sin(x3)*cos(x3)-mphat*g*(sin(x3)^2)*(mphat*(sin(x3)^2)+mchat)+(cos(x3)^2)*(mphat*(sin(x3)^2)-mchat))...
+        /((mphat*(sin(x3)^2)+mchat)^2);
+    A(2,4)=2*mphat*lhat*sin(x3)*x4/(mchat+mphat*(sin(x3)^2));
     A(3,4) = 1;
-    A(4,3)=((u1*sin(x3)*(mp*(sin(x3)^2)+mc)-g*cos(x3)*(mc-mp*(sin(x3)^2)))/(l*(mc+mp*(sin(x3)^2))))...
-        +((-mp*x4^2*(sin(x3)^2)*(mc+mp*(sin(x3)^2)))+(cos(x3)^2)*(mp*(sin(x3)^2)-mc))/((mc+mp*(sin(x3)^2))^2);
-    A(4,4)=2*mp*x4*cos(x3)*sin(x3)/(mc+mp*(sin(x3)^2));
+    A(4,3)=((u1*sin(x3)*(mphat*(sin(x3)^2)+mchat)-g*cos(x3)*(mchat-mphat*(sin(x3)^2)))/(lhat*(mchat+mphat*(sin(x3)^2))))...
+        +((-mphat*x4^2*(sin(x3)^2)*(mchat+mphat*(sin(x3)^2)))+(cos(x3)^2)*(mphat*(sin(x3)^2)-mchat))/((mchat+mphat*(sin(x3)^2))^2);
+    A(4,4)=2*mphat*x4*cos(x3)*sin(x3)/(mchat+mphat*(sin(x3)^2));
 
     B(2,1)=coeff1;
     B(4,1)=-cos(x3).*coeff2;
