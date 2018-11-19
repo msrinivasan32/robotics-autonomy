@@ -153,7 +153,19 @@ for k = 1:num_iter
     fprintf('iLQG Iteration %d,  Current Cost = %e \n',k,cost(1,k));
 
     % Linear Regression to get new parameters
-    [mphat,mchat,lhat]=fnLS(x_traj(:,2:end),u_k,xd(:,2:end));
+    M=10;
+    x_LS=zeros(4,M);
+    xd_LS=zeros(4,M);
+    u_LS=zeros(1,M)
+    for m=1:M
+        u_input=u_new(1)+randn
+        [x,xd]=fnsimulate_2(xo,u_input,2,dt,1,0)
+        x_LS(:,m)=x(:,2);
+        xd_LS(:,m)=xd(:,2);
+        u_LS(:,m)=u_input
+    end
+    
+    [mphat,mchat,lhat]=fnLS(x_LS,u_LS,xd_LS);
     paramchange(1,k+1)=mphat;
     paramchange(2,k+1)=mchat;
     paramchange(3,k+1)=lhat;
