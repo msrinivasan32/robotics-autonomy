@@ -13,3 +13,4 @@ function [Cost] =  fnCostComputation(x_traj,u_new,p_target,dt,Q_f,R)
  TerminalCost= (x_traj(:,Horizon) - p_target)'*Q_f * (x_traj(:,Horizon) - p_target);
  
  Cost = Cost + TerminalCost;
+end
