@@ -54,6 +54,7 @@ dt = 0.01; % for discretization
 
 % Initial Configuration:
 xo = zeros(4,1); % state: [x; x_dot; theta; theta_dot]
+xo(3) = xo(3) + 0.8; % initial perturbation to solve for non-singularity w
 u_k = zeros(1,horizon-1); % control
 du_k = zeros(1,horizon-1); % control
 x_traj = zeros(4,horizon); % trajectory
@@ -159,7 +160,7 @@ for k = 1:num_iter
     u_LS=zeros(1,M)
     for m=1:M
         u_input=u_new(1)+randn
-        [x,xd]=fnsimulate_2(xo,u_input,2,dt,0.01,8)
+        [x,xd]=fnsimulate_2(xo,u_input,2,dt,0.02,5)
         x_LS(:,m)=x(:,2);
         xd_LS(:,m)=xd(:,2);
         u_LS(:,m)=u_input
