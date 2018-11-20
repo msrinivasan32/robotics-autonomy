@@ -69,25 +69,25 @@ A =
 and the objective function can be rewritten as
 
 \begin{equation}
-J(\theta) = \frac{1}{2} A (Z_k - \Phi_k \theta)^T (Z_k - \Phi_k \theta) + \frac{1}{2} (\theta \theta_0)^T {P_0}^{-1} (\theta - \theta_0)
+J(\theta) = \frac{1}{2} (Z_k - \Phi_k \theta)^T A (Z_k - \Phi_k \theta) + \frac{1}{2} (\theta \theta_0)^T {P_0}^{-1} (\theta - \theta_0)
 \end{equation}
 
 Then, to minimize cost, we take the gradient of $J(\theta)$ with respect to $\theta$ and set equal to $0$.
 
 \begin{equation}
-\nabla_\theta J(\theta) = -A {\Phi_k}^T Z_k + A {\Phi_k}^T \Phi_k \theta + {P_0}^{-1} \theta - {P_0}^{-1} \theta_0 = 0
+\nabla_\theta J(\theta) = - {\Phi_k}^T A Z_k + {\Phi_k}^T A \Phi_k \theta + {P_0}^{-1} \theta - {P_0}^{-1} \theta_0 = 0
 \end{equation}
 
 We then solve for $\theta$ to get
 
 \begin{equation}
-\theta = (A {\Phi_k}^T \Phi_k + {P_0}^{-1})^{-1} (A {\Phi_k}^T Z_k + {P_0}^{-1} \theta_0)
+\theta = ( {\Phi_k}^T A \Phi_k + {P_0}^{-1})^{-1} ( {\Phi_k}^T A Z_k + {P_0}^{-1} \theta_0)
 \end{equation}
 
 and we define
 
 \begin{equation}
-{P_k}^{-1} = A {\Phi_k}^T \Phi_k + {P_0}^{-1} \Rightarrow P(k)^{-1} = A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}
+{P_k}^{-1} =  {\Phi_k}^T A \Phi_k + {P_0}^{-1} \Rightarrow P(k)^{-1} =  {\Phi_{k-1}}^T A \Phi_{k-1} + {P_0}^{-1}
 \end{equation}
 
 then
@@ -111,25 +111,26 @@ P(k) = P(k-1) - \frac{P(k-1)\alpha(k)\phi(k)\phi(k)^TP(k-1)}{m(k)^2+\alpha(k)\ph
 We then derive update law for $\theta(k)$ based on parameters in the previous iteration
 
 \begin{equation}
-\theta(k) = P(k) (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0 + \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}) P(k) (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0) + P(k) \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}
+\theta(k) = P(k) ( {\Phi_{k-1}}^T A Z_{k-1} + {P_0}^{-1} \theta_0 + \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}) = P(k) ( {\Phi_{k-1}}^T A Z_{k-1} + {P_0}^{-1} \theta_0) + P(k) 
+\alpha(k)\frac{\phi(k)z(k)}{m(k)^2}
 \end{equation}
 
 and $\theta(k-1)$ can be written as
 
 \begin{equation}
-\theta(k-1) = (A {\Phi_{k-1}}^T \Phi_{k-1} + P_0)^{-1}(A \Phi_{k-1} Z_{k-1} + {P_0}^{-1} \theta_0)
+\theta(k-1) = ( {\Phi_{k-1}}^T A \Phi_{k-1} + P_0)^{-1}( \Phi_{k-1} A Z_{k-1} + {P_0}^{-1} \theta_0)
 \end{equation}
 
 so
 
 \begin{equation}
-(A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}) = (A {\Phi_{k-1}}^T Z_{k-1} + {P_0}^{-1} \theta_0)
+( {\Phi_{k-1}}^T A \Phi_{k-1} + {P_0}^{-1}) \theta(k-1) = ( {\Phi_{k-1}}^T A Z_{k-1} + {P_0}^{-1} \theta_0)
 \end{equation}
 
 Substituting this into $(14)$, we get
 
 \[
-\theta(k) = P(k) (A {\Phi_{k-1}}^T \Phi_{k-1} + {P_0}^{-1}) \theta(k-1) + P(k) \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}
+\theta(k) = P(k) ( {\Phi_{k-1}}^T A \Phi_{k-1} + {P_0}^{-1}) \theta(k-1) + P(k) \alpha(k) \frac{\phi(k)z(k)}{m(k)^2}
 \]
 
 \begin{equation}
@@ -176,7 +177,7 @@ we result in
 \underbrace{f}_{\mathbf{z}} = 
 \underbrace{
 \begin{bmatrix}
-m_p & m_c & l
+m_p & m_c &m_p  l
 \end{bmatrix}}_{\mathbf{w}^T}
 \underbrace{
 \begin{bmatrix}
@@ -185,6 +186,8 @@ m_p & m_c & l
 - \sin \theta \dot{\theta}^2
 \end{bmatrix}}_{\phi}
 \end{equation}
+
+Even though two equations are provided for the dynamics of the cart pole, only one is used for the parameterization because the two equations would yield the same results in the end. Thus, although they are algebraically different, the problem was simplified by using just one equation, the simpler of the two, instead of linearizing both equations to combine them for the regression.
 
 \section{Bonus: Multidimensional Least Squares}
 
